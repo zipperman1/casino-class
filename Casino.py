@@ -2,26 +2,37 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 import sys
 
+
 class PyQtLayout(QWidget):
+
 
     def __init__(self):
         super().__init__()
+        self.main_layout = None
         self.InitializeUI()
 
     def InitializeUI(self):
         self.setFixedSize(800, 600)
         self.setWindowTitle('Casino')
-        self.displayButtons()
-        self.displayRoulette()
+        self.displayGUI()
 
         self.show()
 
-    def displayButtons(self):
+    def displayGUI(self):
+        self.main_layout = QVBoxLayout()
+
+        self.displayCasino()
+        #self.displayUser()
+
+        self.setLayout(self.main_layout)
+
+
+    def displayCasino(self):
         counter = 0
-        self.box = QHBoxLayout()
+        box = QHBoxLayout()
         grid = QGridLayout()
         grid.setSpacing(0)
-        
+
         button_list = list()
         for i in range(1, 37):
             button_list.append(QPushButton(str(i), self))
@@ -35,15 +46,20 @@ class PyQtLayout(QWidget):
             for j in range(0, 12):
                 grid.addWidget(button_list[counter], i, j)
                 counter += 1
-        self.box.addLayout(grid)
-        self.setLayout(self.box)
 
-    def displayRoulette(self):
+        grid.setRowStretch(3, 1)
+        box.addLayout(grid)
+
         square = QFrame()
         square.setFixedSize(200, 200)
         square.setStyleSheet("background-color : grey")
-        self.box.addWidget(square)
-    
+        box.addWidget(square)
+
+        self.main_layout.addLayout(box)
+
+
+    #def displayUser(self):
+
 
 app = QApplication(sys.argv)
 win = PyQtLayout()
