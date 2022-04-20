@@ -1,64 +1,70 @@
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
 import sys
 
 
 class PyQtLayout(QWidget):
-
+    credit = 100000
 
     def __init__(self):
         super().__init__()
-        self.main_layout = None
         self.InitializeUI()
 
     def InitializeUI(self):
-        self.setFixedSize(800, 600)
+        window_size = QSize(1100, 600)
+        palette = QPalette()
+
+        self.setFixedSize(window_size)
         self.setWindowTitle('Casino')
+        palette.setBrush(QPalette.Window, QBrush(QImage('background.jpg').scaled(window_size)))
+        self.setPalette(palette)
         self.displayGUI()
 
         self.show()
 
     def displayGUI(self):
-        self.main_layout = QVBoxLayout()
 
         self.displayCasino()
-        #self.displayUser()
-
-        self.setLayout(self.main_layout)
-
+        self.displayUser()
 
     def displayCasino(self):
         counter = 0
-        box = QHBoxLayout()
-        grid = QGridLayout()
-        grid.setSpacing(0)
+        button_size = 40
 
         button_list = list()
         for i in range(1, 37):
             button_list.append(QPushButton(str(i), self))
-            button_list[i - 1].setFixedSize(40, 40)
+            button_list[i - 1].setFixedSize(button_size, button_size)
             if i % 2 == 0:
                 button_list[i - 1].setStyleSheet("background-color : red")
             else:
-                button_list[i - 1].setStyleSheet("background-color : grey")
+                button_list[i - 1].setStyleSheet("background-color: #333333; color: white;")
 
         for i in range(0, 3):
             for j in range(0, 12):
-                grid.addWidget(button_list[counter], i, j)
+                button_list[counter].move(button_size * 2 + button_size * j, button_size + button_size * i)
                 counter += 1
+        button_list.append(QPushButton('0', self))
+        button_list[36].setFixedSize(button_size, button_size)
+        button_list[36].setStyleSheet("background-color : green")
+        button_list[36].move(button_size, button_size)
 
-        grid.setRowStretch(3, 1)
-        box.addLayout(grid)
+        button_list.append(QPushButton('00', self))
+        button_list[37].move(button_size, button_size*3)
+        button_list[37].setFixedSize(button_size, button_size)
+        button_list[37].setStyleSheet("background-color : green")
 
-        square = QFrame()
-        square.setFixedSize(200, 200)
-        square.setStyleSheet("background-color : grey")
-        box.addWidget(square)
-
-        self.main_layout.addLayout(box)
+        placeholder = QFrame()
+        placeholder.setFixedSize(200, 200)
+        placeholder.setStyleSheet("background-color : violet")
 
 
-    #def displayUser(self):
+    def displayUser(self):
+        credit_counter = QLabel(str(self.credit), self)
+        credit_counter.move(40, 400)
+        credit_counter.setStyleSheet("color: white")
+        credit_counter.setFont(QFont('Arial', 20))
 
 
 app = QApplication(sys.argv)
