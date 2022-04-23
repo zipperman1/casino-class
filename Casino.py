@@ -1,13 +1,17 @@
-from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
+import random
 import sys
+
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QPalette, QBrush, QImage, QFont, QIntValidator
+from PyQt5.QtWidgets import *
 
 
 class PyQtLayout(QWidget):
-    credit = 100000
 
     def __init__(self):
+        self.credit = 10000
+        self.random_value = 0
+
         super().__init__()
         self.InitializeUI()
 
@@ -24,7 +28,6 @@ class PyQtLayout(QWidget):
         self.show()
 
     def displayGUI(self):
-
         self.displayCasino()
         self.displayUser()
 
@@ -55,16 +58,39 @@ class PyQtLayout(QWidget):
         button_list[37].setFixedSize(button_size, button_size)
         button_list[37].setStyleSheet("background-color : green")
 
-        placeholder = QFrame()
-        placeholder.setFixedSize(200, 200)
-        placeholder.setStyleSheet("background-color : violet")
+        self.roulette_number = QLabel(str(self.random_value) + ' test', self)                  # temporary
+        self.roulette_number.setFont(QFont('Arial', 20))
+        self.roulette_number.move(600, 300)
 
+        button_list[0].clicked.connect(lambda: self.rouletteStart(0, self.bet_input.text()))
 
     def displayUser(self):
-        credit_counter = QLabel(str(self.credit), self)
-        credit_counter.move(40, 400)
-        credit_counter.setStyleSheet("color: white")
-        credit_counter.setFont(QFont('Arial', 20))
+        self.credit_counter = QLabel('Credits: ' + str(self.credit) + '\nBet:', self)
+        self.credit_counter.move(40, 400)
+        self.credit_counter.setStyleSheet("color: white")
+        self.credit_counter.setFont(QFont('Arial', 20))
+
+        self.bet_input = QLineEdit(self)
+        self.bet_input.setValidator(QIntValidator())
+        self.bet_input.resize(100, 22)
+        self.bet_input.move(130, 440)
+
+    def rouletteStart(self, num, bet):
+        if not self.bet_input.text().isdigit():
+            self.roulette_number.setText('Error')
+            return
+
+        bet = int(bet)
+        self.random_value = random.randint(1, 38)
+        self.roulette_number.setText(str(self.random_value) + str())
+
+        if num == self.random_value:
+            self.credit += bet
+        else:
+            self.credit -= bet
+
+        self.credit_counter.setText('Credits: ' + str(self.credit) + '\nBet:')
+
 
 
 app = QApplication(sys.argv)
