@@ -1,18 +1,20 @@
 import random
 import sys
 
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QObject
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont, QIntValidator
 from PyQt5.QtWidgets import *
 
 
-class PyQtLayout(QWidget):
+class PyQtLayout(QMainWindow):
 
     def __init__(self):
         self.credit = 10000
         self.random_value = 0
 
         super().__init__()
+        self.red_buttons = list()
+        self.black_buttons = list()
         self.InitializeUI()
 
     def InitializeUI(self):
@@ -28,44 +30,48 @@ class PyQtLayout(QWidget):
         self.show()
 
     def displayGUI(self):
-        self.displayCasino()
         self.displayUser()
+        self.displayCasino()
 
     def displayCasino(self):
-        counter = 0
+        counter = 1
         button_size = 40
 
-        button_list = list()
-        for i in range(1, 37):
-            button_list.append(QPushButton(str(i), self))
-            button_list[i - 1].setFixedSize(button_size, button_size)
-            if i % 2 == 0:
-                button_list[i - 1].setStyleSheet("background-color : red")
-            else:
-                button_list[i - 1].setStyleSheet("background-color: #333333; color: white;")
+        self.button_list = list()
+        range_buttons = list()
 
-        for i in range(0, 3):
-            for j in range(0, 12):
-                button_list[counter].move(button_size * 2 + button_size * j, button_size + button_size * i)
+        self.button_list.append(QPushButton('0', self))  # 0 button
+        self.button_list[0].setFixedSize(button_size, 3 * button_size)
+        self.button_list[0].setStyleSheet("background-color : green")
+        self.button_list[0].move(button_size, button_size)
+        self.button_list[0].clicked.connect(self.rouletteStart)
+
+        for i in range(0, 12):
+            for j in range(0, 3):
+                self.button_list.append(QPushButton(str(counter), self))
+                self.button_list[counter].move(button_size * 2 + button_size * i, button_size + button_size * j)
+                self.button_list[counter].setFixedSize(button_size, button_size)
+                self.button_list[counter].clicked.connect(self.rouletteStart)
+
                 counter += 1
-        button_list.append(QPushButton('0', self))
-        button_list[36].setFixedSize(button_size, button_size)
-        button_list[36].setStyleSheet("background-color : green")
-        button_list[36].move(button_size, button_size)
 
-        button_list.append(QPushButton('00', self))
-        button_list[37].move(button_size, button_size*3)
-        button_list[37].setFixedSize(button_size, button_size)
-        button_list[37].setStyleSheet("background-color : green")
+        self.rouletteColor(1, 10, 1)
+        self.rouletteColor(11, 18, 0)
+        self.rouletteColor(19, 28, 1)
+        self.rouletteColor(29, 36, 0)
 
-        self.roulette_number = QLabel(str(self.random_value) + ' test', self)                  # temporary
-        self.roulette_number.setFont(QFont('Arial', 20))
-        self.roulette_number.move(600, 300)
+        self.rbutton_names = list(['1 to 18', 'Even', 'Red', 'Black', 'Odd', '19 to 36'])
 
-        button_list[0].clicked.connect(lambda: self.rouletteStart(0, self.bet_input.text()))
+        for i in range(0, 6):
+            range_buttons.append(QPushButton(self.rbutton_names[i], self))
+            range_buttons[i].setFixedSize(button_size * 2, button_size)
+            range_buttons[i].move(button_size * 2 + button_size * i * 2, button_size * 4)
+            range_buttons[i].setStyleSheet("background-color: transparent; border: 2px solid")
+            range_buttons[i].clicked.connect(self.rouletteStart)
 
     def displayUser(self):
         self.credit_counter = QLabel('Credits: ' + str(self.credit) + '\nBet:', self)
+        self.credit_counter.setFixedSize(1000, 65)
         self.credit_counter.move(40, 400)
         self.credit_counter.setStyleSheet("color: white")
         self.credit_counter.setFont(QFont('Arial', 20))
@@ -75,22 +81,51 @@ class PyQtLayout(QWidget):
         self.bet_input.resize(100, 22)
         self.bet_input.move(130, 440)
 
-    def rouletteStart(self, num, bet):
-        if not self.bet_input.text().isdigit():
+        self.roulette_number = QLabel(str(self.random_value) + ' test', self)  # temporary
+        self.roulette_number.setFont(QFont('Arial', 50))
+        self.roulette_number.move(600, 300)
+
+    def rouletteColor(self, start, end, shift):
+
+        for i in range(start, end + 1):
+            if (i + shift) % 2 == 0:
+                self.button_list[i].setStyleSheet("background-color : red")
+                self.red_buttons.append(i)
+            else:
+                self.button_list[i].setStyleSheet("background-color: #333333; color: white;")
+                self.black_buttons.append(i)
+
+        print(self.red_buttons)
+
+    def rouletteStart(self):
+        button = self.sender()
+        button_name = button.text()
+        rbutton_func = list([set(range(1, 19)), set(range(1, 37, 2)), set(self.red_buttons), set(self.black_buttons),
+                             set(range(2, 37, 2)), set(range(19, 37))])
+
+        if button_name in self.rbutton_names:
+            num = rbutton_func[self.rbutton_names.index(button_name)]
+        else:
+            num = set([int(button_name)])
+        bet = self.bet_input.text()
+
+        if not self.bet_input.text().isdigit() or int(bet) < 0 or self.credit < int(bet):
             self.roulette_number.setText('Error')
             return
 
-        bet = int(bet)
-        self.random_value = random.randint(1, 38)
-        self.roulette_number.setText(str(self.random_value) + str())
+        self.random_value = random.randint(0, 36)
 
-        if num == self.random_value:
+        print(self.random_value)
+        print(*num)
+
+        bet = int(bet)
+        if self.random_value in num:
             self.credit += bet
         else:
             self.credit -= bet
 
         self.credit_counter.setText('Credits: ' + str(self.credit) + '\nBet:')
-
+        self.roulette_number.setText(str(self.random_value) + str())
 
 
 app = QApplication(sys.argv)
