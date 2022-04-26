@@ -1,7 +1,7 @@
 import random
 import sys
 
-from PyQt5.QtCore import QSize, QObject
+from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont, QIntValidator
 from PyQt5.QtWidgets import *
 
@@ -81,12 +81,14 @@ class PyQtLayout(QMainWindow):
         self.bet_input.resize(100, 22)
         self.bet_input.move(130, 440)
 
-        self.roulette_number = QLabel(str(self.random_value) + ' test', self)  # temporary
+        self.roulette_number = QLabel(str(self.random_value), self)
         self.roulette_number.setFont(QFont('Arial', 50))
-        self.roulette_number.move(600, 300)
+        self.roulette_number.move(700, 40)
+        self.roulette_number.setFixedSize(200, 60)
+
+
 
     def rouletteColor(self, start, end, shift):
-
         for i in range(start, end + 1):
             if (i + shift) % 2 == 0:
                 self.button_list[i].setStyleSheet("background-color : red")
@@ -95,13 +97,11 @@ class PyQtLayout(QMainWindow):
                 self.button_list[i].setStyleSheet("background-color: #333333; color: white;")
                 self.black_buttons.append(i)
 
-        print(self.red_buttons)
-
     def rouletteStart(self):
         button = self.sender()
         button_name = button.text()
-        rbutton_func = list([set(range(1, 19)), set(range(1, 37, 2)), set(self.red_buttons), set(self.black_buttons),
-                             set(range(2, 37, 2)), set(range(19, 37))])
+        rbutton_func = list([set(range(1, 19)), set(range(2, 37, 2)), set(self.red_buttons), set(self.black_buttons),
+                             set(range(1, 37, 2)), set(range(19, 37))])
 
         if button_name in self.rbutton_names:
             num = rbutton_func[self.rbutton_names.index(button_name)]
@@ -109,14 +109,11 @@ class PyQtLayout(QMainWindow):
             num = set([int(button_name)])
         bet = self.bet_input.text()
 
-        if not self.bet_input.text().isdigit() or int(bet) < 0 or self.credit < int(bet):
+        if not self.bet_input.text().isdigit() or int(bet) <= 0 or self.credit < int(bet):
             self.roulette_number.setText('Error')
             return
 
         self.random_value = random.randint(0, 36)
-
-        print(self.random_value)
-        print(*num)
 
         bet = int(bet)
         if self.random_value in num:
