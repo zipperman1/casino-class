@@ -1,9 +1,9 @@
 import random
 import sys
 
-from PyQt5.QtCore import *
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont, QIntValidator
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QLabel, QLineEdit, QApplication
 
 
 class PyQtLayout(QMainWindow):
@@ -86,8 +86,6 @@ class PyQtLayout(QMainWindow):
         self.roulette_number.move(700, 40)
         self.roulette_number.setFixedSize(200, 60)
 
-
-
     def rouletteColor(self, start, end, shift):
         for i in range(start, end + 1):
             if (i + shift) % 2 == 0:
@@ -100,14 +98,17 @@ class PyQtLayout(QMainWindow):
     def rouletteStart(self):
         button = self.sender()
         button_name = button.text()
+        bet = self.bet_input.text()
+
         rbutton_func = list([set(range(1, 19)), set(range(2, 37, 2)), set(self.red_buttons), set(self.black_buttons),
                              set(range(1, 37, 2)), set(range(19, 37))])
 
         if button_name in self.rbutton_names:
             num = rbutton_func[self.rbutton_names.index(button_name)]
+            win = int(bet)
         else:
             num = set([int(button_name)])
-        bet = self.bet_input.text()
+            win = 5 * int(bet)
 
         if not self.bet_input.text().isdigit() or int(bet) <= 0 or self.credit < int(bet):
             self.roulette_number.setText('Error')
@@ -117,7 +118,7 @@ class PyQtLayout(QMainWindow):
 
         bet = int(bet)
         if self.random_value in num:
-            self.credit += bet
+            self.credit += win
         else:
             self.credit -= bet
 
